@@ -15,7 +15,18 @@ from email import encoders
 import os
 from datetime import datetime
 import requests
-
+IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
+imgbb_url1 = ""
+def upload_to_imgbb(file_path):
+    url = "https://api.imgbb.com/1/upload"
+    with open(file_path, "rb") as file:
+        response = requests.post(url, data={"key": IMGBB_API_KEY}, files={"image": file})
+    if response.status_code == 200:
+        result = response.json()
+        return result["data"]["url"]  # Returns the image URL
+    else:
+        print("Failed to upload to ImgBB:", response.text)
+        return None
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     # Fetch MySQL credentials from environment variables
     mysql_host = os.getenv('MYSQL_HOST')
@@ -46,7 +57,7 @@ def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     """
     pgSlug = re.sub(r'[^a-zA-Z0-9\s-]', '', slug.replace('The title is', '').replace('The title of this blog post is', '')).lower().strip().replace('\n', ' ').replace(' ', '-').replace('the-title-of-this-polished-and-professional-blog-post-is', "").replace('the-title-of-this-polished-and-professional-blog-post-is', "")
     page_values = (
-        pgSlug , "_self", "post", "https://multiculturaltoolbox.com/assets/img/nastuh.jpg",
+        pgSlug , "_self", "post", imgbb_url1,
         None, None, None,
         1, 1,1,
         1, 1, 1,
@@ -734,6 +745,7 @@ try:
         try:
             download_image(image_url, file_name)
             download_image(image_url, file_name1)
+            imgbb_url1 = upload_to_imgbb(file_name)
         except Exception as e:
             print(f"Error generating random inputs for entry '{entry['title']}': {e}")
             continue  # Skip to the next entry if input generation fails
@@ -768,6 +780,10 @@ try:
                     content=blog_content["blog"].replace('"', '').replace("Here's the polished and professional version of the blog post", '').replace(':', '').replace('Let me know if you need any further assistance', '').replace('"', '').replace('<br>', '').replace("Here's a polished and professional version of the blog post", '').replace('Here is the edited blog post', '').replace('Here is the revised blog post', '').replace('\n', '<br>').replace('The title is', '').replace('The title of this blog post is', '').replace('Here is a polished and professional version of the blog post', ''),
                     attachment_path=file_name
                 )
+
+                
+
+
                 title = blog_content["title"].replace('*', '').replace('"', '').replace("Here's the polished and professional version of the blog post", '').replace('The title of the blog post is', '').replace(':', '').replace('<br>', '').replace('The title of this edited blog post is', '').replace('Based on your edited blog post, I would title it', '').replace('Here is the edited blog post', '').replace('Here is the revised blog post', '').replace('The title is', '').replace('The title of this blog post is', '').replace('Here is a polished and professional version of the blog post', '')
                 summary = blog_content["blog"].replace('*', '').replace('"', '').replace("Here's the polished and professional version of the blog post", '').replace(':', '').replace('Let me know if you need any further assistance', '').replace('"', '').replace('<br>', '').replace("Here's a polished and professional version of the blog post", '').replace('Here is the edited blog post', '').replace('Here is the revised blog post', '').replace('\n', '<br>').replace('The title is', '').replace('The title of this blog post is', '').replace('Here is a polished and professional version of the blog post', '')
                 content = blog_content["blog"].replace('"', '').replace("Here's the polished and professional version of the blog post", '').replace(':', '').replace('Let me know if you need any further assistance', '').replace('"', '').replace('<br>', '').replace("Here's a polished and professional version of the blog post", '').replace('Here is the edited blog post', '').replace('Here is the revised blog post', '').replace('\n', '<br>').replace('The title is', '').replace('The title of this blog post is', '').replace('Here is a polished and professional version of the blog post', '')
