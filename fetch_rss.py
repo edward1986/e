@@ -28,8 +28,8 @@ import uuid
 def generate_random_image_name():
     """Generates a unique random image filename."""
     return f"image_{uuid.uuid4().hex[:8]}.jpg"
-def upload_to_imgbb(image_path):
-    IMAGE_NAME = generate_random_image_name()
+IMAGE_NAME = generate_random_image_name()
+def upload_to_imgbb():
     IMAGE_DIR = "generated/" 
     os.makedirs(IMAGE_DIR, exist_ok=True)
     shutil.move(IMAGE_NAME, os.path.join(IMAGE_DIR, IMAGE_NAME))
@@ -764,10 +764,10 @@ try:
     for entry in existing_entries:
         __title = entry["title"]
         image_url = f"https://pollinations.ai/p/{__title}?width={width}&height={height}&seed={seed}&model={model}"
-        file_name = f"image.jpg"
-        file_name1 = f"generated/image_{seed}.jpg"
+        file_name = f"{IMAGE_NAME}.jpg"
+        file_name1 = f"generated/{IMAGE_NAME}.jpg"
         try:
-            download_image(image_url, file_name)
+            download_image(image_url, IMAGE_)
             download_image(image_url, file_name1)
             imgbb_url1 = upload_to_imgbb(file_name)
         except Exception as e:
