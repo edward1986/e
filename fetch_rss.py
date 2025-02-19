@@ -21,13 +21,13 @@ IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
 imgbb_url1 = ""
 API_KEY1 = "6FQIhWHsj5czORPWF8AC67hpstFVi4IXmhSDJGwk37TZeXBWC7LSiLFhTlLeO33L"
 API_KEY2 = "eIGALCKbF8adZdrU20JLgKyCU8raHQBBWstpOomEe41FQ7sd2Q8WIPWHLxguGXyx"
+AUTH_URL = "https://api.fastupload.io/api/v2/authorize"
+UPLOAD_URL = "https://api.fastupload.io/api/v2/file/upload"
 def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 def upload_to_imgbb(image_path):
-    AUTH_URL = "https://api.fastupload.io/api/v2/authorize"
-    UPLOAD_URL = "https://api.fastupload.io/api/v2/file/upload"
     access_token, account_id = get_access_token()
     if access_token and account_id:
         file_path = image_path
