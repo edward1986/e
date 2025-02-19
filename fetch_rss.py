@@ -17,6 +17,7 @@ from datetime import datetime
 import requests
 import base64
 import yake
+get_access_token()
 IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
 imgbb_url1 = ""
 API_KEY1 = "6FQIhWHsj5czORPWF8AC67hpstFVi4IXmhSDJGwk37TZeXBWC7LSiLFhTlLeO33L"
@@ -61,7 +62,7 @@ def get_access_token():
     
     response = requests.post(AUTH_URL, data=payload)
     data = response.json()
-
+    print(data)
     if data["_status"] == "success":
         return data["data"]["access_token"], data["data"]["account_id"]
     else:
