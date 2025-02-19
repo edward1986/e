@@ -19,24 +19,34 @@ import base64
 import yake
 IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
 imgbb_url1 = ""
+
 def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
-
+import shutil
+import uuid
+def generate_random_image_name():
+    """Generates a unique random image filename."""
+    return f"image_{uuid.uuid4().hex[:8]}.jpg"
 def upload_to_imgbb(image_path):
-    image_base64 = encode_image_to_base64(image_path)
-    url = f"https://api.imgbb.com/1/upload?key={IMGBB_API_KEY}"
+    IMAGE_NAME = generate_random_image_name()
+    IMAGE_DIR = "generated/" 
+    os.makedirs(IMAGE_DIR, exist_ok=True)
+    shutil.move(IMAGE_NAME, os.path.join(IMAGE_DIR, IMAGE_NAME))
+    # Git commands to push image
+    try:
+        subprocess.run(["git", "add", IMAGE_DIR], check=True)
+        subprocess.run(["git", "commit", "-m", "Added new image via script"], check=True)
+        subprocess.run(["git", "push", "origin", "main"], check=True)
+        print("✅ Image uploaded successfully to GitHub!")
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error: {e}")
+    GITHUB_USERNAME = "edward1986"
+    REPO_NAME = "e"
     
-
-    payload = {"image": image_base64}
-    response = requests.post(url, data=payload)
-
-    if response.status_code == 200:
-        result = response.json()
-        return result["data"]["url"]  # Return uploaded image URL
-    else:
-        print("Upload failed:", response.text)
-        return None
+    image_url = f"https://raw.githubusercontent.com/{GITHUB_USERNAME}/{REPO_NAME}/main/{IMAGE_DIR}{IMAGE_NAME}"
+    imgbb_url1 = image_url
+    print(f"🔗 Image URL: {image_url}")
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=10)
     keywordsYake = kw_extractor.extract_keywords(content)
