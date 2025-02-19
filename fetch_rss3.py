@@ -11,6 +11,24 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import os
 from datetime import datetime
+import base64
+IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
+imgbb_url1 = ""
+
+def upload_to_imgbb(image_path):
+    image_base64 = encode_image_to_base64(image_path)
+    url = f"https://api.imgbb.com/1/upload?key={IMGBB_API_KEY}"
+    
+
+    payload = {"image": image_base64}
+    response = requests.post(url, data=payload)
+
+    if response.status_code == 200:
+        result = response.json()
+        return result["data"]["url"]  # Return uploaded image URL
+    else:
+        print("Upload failed:", response.text)
+        return None
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     # Fetch MySQL credentials from environment variables
     mysql_host = os.getenv('MYSQL_HOST')

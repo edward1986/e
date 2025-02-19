@@ -15,17 +15,23 @@ from email import encoders
 import os
 from datetime import datetime
 import requests
+import base64
 IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
 imgbb_url1 = ""
-def upload_to_imgbb(file_path):
-    url = "https://api.imgbb.com/1/upload"
-    with open(file_path, "rb") as file:
-        response = requests.post(url, data={"key": IMGBB_API_KEY}, files={"image": file})
+
+def upload_to_imgbb(image_path):
+    image_base64 = encode_image_to_base64(image_path)
+    url = f"https://api.imgbb.com/1/upload?key={IMGBB_API_KEY}"
+    
+
+    payload = {"image": image_base64}
+    response = requests.post(url, data=payload)
+
     if response.status_code == 200:
         result = response.json()
-        return result["data"]["url"]  # Returns the image URL
+        return result["data"]["url"]  # Return uploaded image URL
     else:
-        print("Failed to upload to ImgBB:", response.text)
+        print("Upload failed:", response.text)
         return None
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     # Fetch MySQL credentials from environment variables
