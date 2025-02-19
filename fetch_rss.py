@@ -19,24 +19,55 @@ import base64
 import yake
 IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
 imgbb_url1 = ""
+API_KEY1 = "6FQIhWHsj5czORPWF8AC67hpstFVi4IXmhSDJGwk37TZeXBWC7LSiLFhTlLeO33L"
+API_KEY2 = "eIGALCKbF8adZdrU20JLgKyCU8raHQBBWstpOomEe41FQ7sd2Q8WIPWHLxguGXyx"
 def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 def upload_to_imgbb(image_path):
-    image_base64 = encode_image_to_base64(image_path)
-    url = f"https://api.imgbb.com/1/upload?key={IMGBB_API_KEY}"
+    AUTH_URL = "https://api.fastupload.io/api/v2/authorize"
+    UPLOAD_URL = "https://api.fastupload.io/api/v2/file/upload"
+    access_token, account_id = get_access_token()
+    if access_token and account_id:
+        file_path = image_path
+        upload_response = upload_file(access_token, account_id, file_path)
+        if upload_response["_status"] == "success":
+            imgbb_url1 = upload_response["data"][0]["url"]
+            print("File uploaded successfully:", upload_response["data"][0]["url"])
+        else:
+            print("File upload failed:", upload_response.get("response", "Unknown error"))
+
+def upload_file(access_token, account_id, file_path):
+    """Upload a file using the obtained access token."""
+    params = {
+        "access_token": access_token,
+        "account_id": account_id,
+        "folder_id": ""  # Optional, leave blank to upload to root folder
+    }
+
+    with open(file_path, "rb") as file:
+        files = {"upload_file": file}
+        response = requests.post(UPLOAD_URL, data=params, files=files)
     
+    return response.json()
 
-    payload = {"image": image_base64}
-    response = requests.post(url, data=payload)
+def get_access_token():
+    """Authenticate and get access_token and account_id."""
+    payload = {
+        "key1": API_KEY1,
+        "key2": API_KEY2
+    }
+    
+    response = requests.post(AUTH_URL, data=payload)
+    data = response.json()
 
-    if response.status_code == 200:
-        result = response.json()
-        return result["data"]["url"]  # Return uploaded image URL
+    if data["_status"] == "success":
+        return data["data"]["access_token"], data["data"]["account_id"]
     else:
-        print("Upload failed:", response.text)
-        return None
+        print("Authentication failed:", data.get("response", "Unknown error"))
+        return None, None
+
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=10)
     keywordsYake = kw_extractor.extract_keywords(content)
