@@ -769,7 +769,7 @@ try:
         try:
             download_image(image_url, IMAGE_NAME)
             download_image(image_url, IMAGE_NAME)
-            imgbb_url1 = upload_to_imgbb(file_name)
+            imgbb_url1 = upload_to_imgbb()
         except Exception as e:
             print(f"Error generating random inputs for entry '{entry['title']}': {e}")
             continue  # Skip to the next entry if input generation fails
