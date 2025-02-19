@@ -35,6 +35,8 @@ def upload_to_imgbb():
     shutil.move(IMAGE_NAME, os.path.join(IMAGE_DIR, IMAGE_NAME))
     # Git commands to push image
     try:
+        subprocess.run(["git", "config", "--global", "user.name", "github-actions[bot]"], check=True)
+        subprocess.run(["git", "config", "--global", "user.email", "github-actions[bot]@users.noreply.github.com"], check=True)
         subprocess.run(["git", "add", IMAGE_DIR], check=True)
         subprocess.run(["git", "commit", "-m", "Added new image via script"], check=True)
         subprocess.run(["git", "push", "origin", "main"], check=True)
