@@ -764,11 +764,11 @@ try:
     for entry in existing_entries:
         __title = entry["title"]
         image_url = f"https://pollinations.ai/p/{__title}?width={width}&height={height}&seed={seed}&model={model}"
-        file_name = f"{IMAGE_NAME}.jpg"
-        file_name1 = f"generated/{IMAGE_NAME}.jpg"
+        file_name = f"{IMAGE_NAME}"
+        file_name1 = f"generated/{IMAGE_NAME}"
         try:
-            download_image(image_url, IMAGE_)
-            download_image(image_url, file_name1)
+            download_image(image_url, IMAGE_NAME)
+            download_image(image_url, IMAGE_NAME)
             imgbb_url1 = upload_to_imgbb(file_name)
         except Exception as e:
             print(f"Error generating random inputs for entry '{entry['title']}': {e}")
