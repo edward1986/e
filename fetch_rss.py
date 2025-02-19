@@ -17,7 +17,7 @@ from datetime import datetime
 import requests
 import base64
 import yake
-get_access_token()
+
 IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
 imgbb_url1 = ""
 API_KEY1 = "6FQIhWHsj5czORPWF8AC67hpstFVi4IXmhSDJGwk37TZeXBWC7LSiLFhTlLeO33L"
@@ -68,7 +68,7 @@ def get_access_token():
     else:
         print("Authentication failed:", data.get("response", "Unknown error"))
         return None, None
-
+get_access_token()
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=10)
     keywordsYake = kw_extractor.extract_keywords(content)
