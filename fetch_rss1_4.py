@@ -20,6 +20,9 @@ import os
 import base64
 IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
 imgbb_url1 = ""
+def encode_image_to_base64(image_path):
+    with open(image_path, "rb") as image_file:
+        return base64.b64encode(image_file.read()).decode("utf-8")
 
 def upload_to_imgbb(image_path):
     image_base64 = encode_image_to_base64(image_path)
