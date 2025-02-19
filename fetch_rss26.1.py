@@ -146,12 +146,13 @@ width = 720
 height = 1280
 model = 'flux'
 # Read seed from file or initialize it
+
 seed_file = 'seed.txt'
 if os.path.exists(seed_file):
     with open(seed_file, 'r') as file:
-        seed = int(file.read().strip()) + 1
+        seed = int(file.read().strip()) + random.randint(1, 100) 
 else:
-    seed = 1
+    seed = random.randint(1, 100) 
 rss_url = 'https://qatarjust.com/feed/'
 feed = feedparser.parse(rss_url)
 
