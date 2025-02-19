@@ -18,6 +18,7 @@ from datetime import datetime
 import json
 import os
 import base64
+import yake
 IMGBB_API_KEY = "6952d5786366e69261dae85e82a6d537"
 imgbb_url1 = ""
 def encode_image_to_base64(image_path):
@@ -39,6 +40,9 @@ def upload_to_imgbb(image_path):
         print("Upload failed:", response.text)
         return None
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
+    kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=10)
+    keywordsYake = kw_extractor.extract_keywords(content)
+    keywords_string = ", ".join([kw for kw, score in keywordsYake])
     # Fetch MySQL credentials from environment variables
     mysql_host = os.getenv('MYSQL_HOST')
     mysql_user = os.getenv('MYSQL_USER')
@@ -68,7 +72,7 @@ def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     """
     page_values = (
         re.sub(r'[^a-zA-Z0-9\s-]', '', slug.replace('The title is', '').replace('The title of this blog post is', '')).lower().strip().replace('\n', ' ').replace(' ', '-').replace('the-title-of-this-polished-and-professional-blog-post-is', ""), "_self", "post", imgbb_url1,
-        None, None, None,
+        None, None, keywords_string,
         1, 1,1,
         1, 1, 1,
         None, created_at, updated_at
