@@ -23,19 +23,35 @@ def encode_image_to_base64(image_path):
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 def upload_to_imgbb(image_path):
-    image_base64 = encode_image_to_base64(image_path)
-    url = f"https://api.imgbb.com/1/upload?key={IMGBB_API_KEY}"
+    client_id = '89f6d9cac860591'
+    url = 'https://api.imgur.com/3/upload'
+    with open(image_path, 'rb') as image_file:
+        # Define headers for authorization
+        headers = {
+            'Authorization': f'Client-ID {client_id}'
+        }
+        
+        # Define the file to be uploaded
+        files = {
+            'image': image_file
+        }
     
-
-    payload = {"image": image_base64}
-    response = requests.post(url, data=payload)
-
-    if response.status_code == 200:
-        result = response.json()
-        return result["data"]["url"]  # Return uploaded image URL
-    else:
-        print("Upload failed:", response.text)
-        return None
+        # Additional form data (optional)
+        data = {
+            'title': 'Simple upload',  # Optional title for the image
+            'description': 'This is a simple image upload in Imgur'  # Optional description
+        }
+        
+        # Make the POST request to upload the image
+        response = requests.post(url, headers=headers, files=files, data=data)
+        
+        # Check if the upload was successful
+        if response.status_code == 200:
+            json_data = response.json()
+            imgbb_url1 = json_data['data']['link']
+            print(f"Image uploaded successfully! Link: {json_data['data']['link']}")
+        else:
+            print(f"Failed to upload image. Status code: {response.status_code}")
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=10)
     keywordsYake = kw_extractor.extract_keywords(content)
