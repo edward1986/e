@@ -53,7 +53,7 @@ def upload_to_imgbb(image_path):
         else:
             print(f"Failed to upload image. Status code: {response.status_code}")
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
-    kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=10)
+    kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=20)
     keywordsYake = kw_extractor.extract_keywords(content)
     keywords_string = ", ".join([kw for kw, score in keywordsYake])
     # Fetch MySQL credentials from environment variables
