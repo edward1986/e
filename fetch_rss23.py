@@ -48,8 +48,7 @@ def upload_to_imgbb(image_path):
         # Check if the upload was successful
         if response.status_code == 200:
             json_data = response.json()
-            imgbb_url1 = json_data['data']['link']
-            print(f"Image uploaded successfully! Link: {json_data['data']['link']}")
+            return json_data['data']['link']
         else:
             print(f"Failed to upload image. Status code: {response.status_code}")
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
