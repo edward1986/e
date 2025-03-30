@@ -789,7 +789,7 @@ word_of_the_day = fetch_word_of_the_day() or "innovation"
 try:
     for entry in existing_entries:
         __title = entry["title"]
-        image_url = f"https://image.pollinations.ai/prompt/{__title}?width={width}&height={height}&seed={seed}&model={model}"
+        image_url = f"https://pollinations.ai/p/{__title}?width={width}&height={height}&seed={seed}&model={model}"
         file_name = f"image.jpg"
         file_name1 = f"generated/image_{seed}.jpg"
         try:
