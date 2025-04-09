@@ -28,38 +28,28 @@ def encode_image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode("utf-8")
 
-def upload_to_imgbb(image_path):
-    client_id = '89f6d9cac860591'
-    url = 'https://api.imgur.com/3/upload'
-    with open(image_path, 'rb') as image_file:
-        # Define headers for authorization
-        headers = {
-            'Authorization': f'Client-ID {client_id}'
+def upload_file(file_path):
+    headers = {
+        "Authorization": f"token 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",
+        "Accept": "application/vnd.github.v3+json",
+        "User-Agent": "Python-GitHubClient"
+    }
+
+    with open(file_path, "rb") as file:
+        file_content = base64.b64encode(file.read()).decode('utf-8')
+
+    payload = {
+        "event_type": "file_upload",
+        "client_payload": {
+            "filename": file_path,
+            "content": file_content
         }
-        
-        # Define the file to be uploaded
-        files = {
-            'image': image_file
-        }
-    
-        # Additional form data (optional)
-        data = {
-            'title': 'Simple upload',  # Optional title for the image
-            'description': 'This is a simple image upload in Imgur'  # Optional description
-        }
-        
-        # Make the POST request to upload the image
-        response = requests.post(url, headers=headers, files=files, data=data)
-        
-        # Check if the upload was successful
-        if response.status_code == 200:
-            json_data = response.json()
-            
-            print(f"Image uploaded successfully! Link: {json_data['data']['link']}")
-            return json_data['data']['link']
-        else:
-            return None
-            print(f"Failed to upload image. Status code: {response.status_code}")
+    }
+
+    url = "https://api.github.com/repos/edward1986/fileupload/dispatches"
+    response = requests.post(url, headers=headers, json=payload)
+
+    return "https://raw.githubusercontent.com/edward1986/fileupload/refs/heads/main/uploads/" + file_path
 
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=20)
