@@ -29,6 +29,7 @@ def encode_image_to_base64(image_path):
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 def upload_file(file_path):
+    file_name = os.path.basename(file_path)
     headers = {
         "Authorization": f"token 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",
         "Accept": "application/vnd.github.v3+json",
@@ -49,7 +50,7 @@ def upload_file(file_path):
     url = "https://api.github.com/repos/edward1986/fileupload/dispatches"
     response = requests.post(url, headers=headers, json=payload)
 
-    return "https://raw.githubusercontent.com/edward1986/fileupload/refs/heads/main/uploads/" + file_path
+    return "https://raw.githubusercontent.com/edward1986/fileupload/refs/heads/main/uploads/" + file_name
 
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=20)
