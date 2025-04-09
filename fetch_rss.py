@@ -29,28 +29,34 @@ def encode_image_to_base64(image_path):
         return base64.b64encode(image_file.read()).decode("utf-8")
 
 def upload_to_imgbb(file_path):
-    file_name = os.path.basename(file_path)
-    headers = {
-        "Authorization": f"token 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",
-        "Accept": "application/vnd.github.v3+json",
-        "User-Agent": "Python-GitHubClient"
-    }
+    api_url = "https://freeimage.host/api/1/upload"
+    api_key = "6d207e02198a847aa98d0a2a901485a5"
+    
+    # Open the image and encode it in base64
+    with open(file_path, "rb") as image_file:
+        image_data = base64.b64encode(image_file.read()).decode('utf-8')
 
-    with open(file_path, "rb") as file:
-        file_content = base64.b64encode(file.read()).decode('utf-8')
-
+    # Define the payload for the POST request
     payload = {
-        "event_type": "file_upload",
-        "client_payload": {
-            "filename": file_path,
-            "content": file_content
-        }
+        "key": api_key,
+        "action": "upload",
+        "source": image_data,
+        "format": "json"  # Set the response format to JSON
     }
 
-    url = "https://api.github.com/repos/edward1986/fileupload/dispatches"
-    response = requests.post(url, headers=headers, json=payload)
+    # Make the POST request to upload the image
+    response = requests.post(api_url, data=payload)
 
-    return "https://raw.githubusercontent.com/edward1986/fileupload/refs/heads/main/uploads/" + file_name
+    # Check if the response is successful
+    if response.status_code == 200:
+        print("Image uploaded successfully!")
+        # Parse the JSON response to get the image URL
+        response_json = response.json()
+        image_url = response_json.get("image", {}).get("url", "")
+        return image_url
+    else:
+        print(f"Failed to upload image. Status code: {response.status_code}")
+        return None
 
 def insert_blog_post_to_db(title, summary, content, keywords, slug, thumbnail):
     kw_extractor = yake.KeywordExtractor(lan="en", n=2, dedupLim=0.9, top=20)
