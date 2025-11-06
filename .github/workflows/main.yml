@@ -1,8 +1,7 @@
 name: Fetch RSS Feed and Update Rep2
-ununsed
 on:
   schedule:
-    - cron: '0 0 * * *'  # This will run every hour
+    - cron: '0 15 * * *'
   workflow_dispatch:  # Manual trigger option
 
 jobs:
