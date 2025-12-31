@@ -789,7 +789,7 @@ try:
     for entry in new_entries:
         __title = entry["title"]
         print(entry["title"])
-        image_url = f"https://gen.pollinations.ai/image/{__title}?width={width}&height={height}&seed={seed}&model={model}"
+        image_url = f"https://gen.pollinations.ai/image/{__title}?width={width}&height={height}&seed={seed}&model={model}&key=sk_HVSE64HbUjwvTPwYJCTxGEamFlJnxmji"
         file_name = f"image.jpg"
         file_name1 = f"generated/image_{seed}.jpg"
         try:
