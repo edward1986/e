@@ -163,7 +163,7 @@ def download_image(image_url, file_name):
     print(f'Download Completed: {file_name}')
 width = 720
 height = 1280
-model = 'turbo'
+model = 'flux'
 # Read seed from file or initialize it
 
 seed_file = 'seed.txt'
