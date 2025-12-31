@@ -150,7 +150,7 @@ def download_image(image_url, file_name):
 
 width = 720
 height = 1280
-model = 'flux'
+model = 'turbo'
 # Read seed from file or initialize it
 
 seed_file = 'seed.txt'
@@ -774,7 +774,7 @@ word_of_the_day = fetch_word_of_the_day() or "innovation"
 try:
     for entry in existing_entries:
         __title = entry["title"]
-        image_url = f"https://pollinations.ai/p/{__title}?width={width}&height={height}&seed={seed}&model={model}"
+        image_url = f"https://gen.pollinations.ai/image/{__title}?width={width}&height={height}&seed={seed}&model={model}"
         file_name = f"image.jpg"
         file_name1 = f"generated/image_{seed}.jpg"
         try:
