@@ -607,7 +607,7 @@ def extract_content(json_data: dict) -> str:
 
 def call_cf_ai(prompt: str, endpoint: str) -> str:
     res = requests.post(
-        endpoint,
+        "https://morning-dew-a596.ntcedge2.workers.dev",
         headers={"Content-Type": "application/json"},
         json={
             "model": "@cf/openai/gpt-oss-120b",
@@ -769,11 +769,11 @@ def get_ollama_response(input_text, no_words, blog_style, word_of_the_day, model
     prompt = random.choice(prompts) + " Use a professional yet approachable tone, and make sure the content is easy to read, with clear subheadings and varied sentence structure for improved readability. Integrate keywords relevant to the tool and field"
     try:
         # 1) Generate blog/decline note
-        blog = call_cf_ai(prompt, endpoint)
+        blog = call_cf_ai(prompt, "https://morning-dew-a596.ntcedge2.workers.dev")
     
         # 2) Generate title (second call)
         title_prompt = f"What is the title for this? {blog}"
-        title = call_cf_ai(title_prompt, endpoint)
+        title = call_cf_ai(title_prompt, "https://morning-dew-a596.ntcedge2.workers.dev")
         return {
             "blog": blog,
             "title": title
