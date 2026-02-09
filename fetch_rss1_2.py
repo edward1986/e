@@ -590,6 +590,51 @@ class AICrew:
         Make it polished and professional. Content: {content}
         """
         return self.run_ollama(prompt)
+
+
+def extract_content(json_data: dict) -> str:
+    """
+    Matches:
+    (json?.result?.response ?? json?.result?.choices?.[0]?.message?.content ?? "").toString().trim()
+    """
+    result = (json_data or {}).get("result", {}) if isinstance(json_data, dict) else {}
+    content = (
+        result.get("response")
+        or (((result.get("choices") or [{}])[0].get("message") or {}).get("content"))
+        or ""
+    )
+    return str(content).strip()
+
+def call_cf_ai(prompt: str, endpoint: str) -> str:
+    res = requests.post(
+        endpoint,
+        headers={"Content-Type": "application/json"},
+        json={
+            "model": "@cf/openai/gpt-oss-120b",
+            "instructions": (
+                "Write record-safe decline notes for government use. Output exactly ONE sentence. "
+                "Use neutral tone. Do not add facts not present in the input. "
+                "If giving a suggestion, keep it generic and non-committal."
+            ),
+            "input": prompt,
+            "max_output_tokens": 80,
+        },
+        timeout=60,
+    )
+
+    try:
+        json_data = res.json()
+    except Exception:
+        json_data = {}
+
+    out = extract_content(json_data)
+
+    # mimic: if (res.ok && out) return out;
+    if res.ok and out:
+        return out
+
+    # optional: surface errors
+    raise Exception(f"AI request failed (HTTP {res.status_code}): {res.text[:300]}")
 def get_ollama_response(input_text, no_words, blog_style, word_of_the_day, model_name="llama3"):
     """Generate a blog using Ollama with the provided inputs."""
     today_year = datetime.now().year
@@ -723,29 +768,15 @@ def get_ollama_response(input_text, no_words, blog_style, word_of_the_day, model
     ]                     
     prompt = random.choice(prompts) + " Use a professional yet approachable tone, and make sure the content is easy to read, with clear subheadings and varied sentence structure for improved readability. Integrate keywords relevant to the tool and field"
     try:
-        ensure_model_available(model_name)
-        result = subprocess.run(
-            ["ollama", "run", model_name, prompt],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
-        
-        if result.returncode != 0:
-            raise Exception(f"Error running model: {result.stderr.strip()}")
-        print("Ollama Response Retrieved Successfully.")
-        crew = AICrew(model_name)
-        final_content = crew.edit_content(result.stdout.strip())
-        promptTitle = f"what is the title  {final_content}?"
-        resultTitle = subprocess.run(
-            ["ollama", "run", model_name, promptTitle],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True
-        )
+        # 1) Generate blog/decline note
+        blog = call_cf_ai(prompt, endpoint)
+    
+        # 2) Generate title (second call)
+        title_prompt = f"What is the title for this? {blog}"
+        title = call_cf_ai(title_prompt, endpoint)
         return {
-            "blog": (final_content),
-            "title": resultTitle.stdout.strip()
+            "blog": blog,
+            "title": title
         }
     except Exception as e:
         return f"Error during query: {e}"
