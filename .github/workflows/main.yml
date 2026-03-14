@@ -62,6 +62,8 @@ jobs:
             MYSQL_USER: ${{ secrets.MYSQL_USER }}  # MySQL username (stored in GitHub Secrets)
             MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}  # MySQL password (stored in GitHub Secrets)
             MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
+            CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+            CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set +e  # Allow the script to continue on errors
           python fetch_rss1_2.py
