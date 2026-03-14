@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from cloudflare_image import generate_image_cloudflare
+
 import os
 from datetime import datetime
 import requests

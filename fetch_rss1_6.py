@@ -9,6 +9,7 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+from cloudflare_image import generate_image_cloudflare
 
 import os
 from datetime import datetime
@@ -788,8 +789,21 @@ try:
         file_name = f"image.jpg"
         file_name1 = f"generated/image_{seed}.jpg"
         try:
-            download_image(image_url, file_name)
-            download_image(image_url, file_name1)
+            generate_image_cloudflare(
+                prompt=__title,
+                output_path=file_name,
+                seed=seed,
+                width=width,
+                height=height
+            )
+        
+            generate_image_cloudflare(
+                prompt=__title,
+                output_path=file_name1,
+                seed=seed,
+                width=width,
+                height=height
+            )
             imgbb_url1 = upload_to_imgbb(file_name)
         except Exception as e:
             print(f"Error generating random inputs for entry '{entry['title']}': {e}")
