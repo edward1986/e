@@ -7,7 +7,7 @@ CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
 CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN")
 
 # Good fast default for text-to-image on Workers AI
-CLOUDFLARE_IMAGE_MODEL = "@cf/black-forest-labs/flux-1-schnell"
+CLOUDFLARE_IMAGE_MODEL = "@cf/lykon/dreamshaper-8-lcm"
 
 
 def generate_image_cloudflare(
