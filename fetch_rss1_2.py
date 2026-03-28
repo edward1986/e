@@ -12,6 +12,7 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from cloudflare_image import generate_image_cloudflare
+from ollama_image import generate_image_ollama
 import os
 from datetime import datetime
 import requests
@@ -821,7 +822,7 @@ try:
         file_name = f"image.jpg"
         file_name1 = f"generated/image_{seed}.jpg"
         try:
-            generate_image_cloudflare(
+            generate_image_ollama(
                 prompt=__title,
                 output_path=file_name,
                 seed=seed,
@@ -829,9 +830,9 @@ try:
                 height=height
             )
         
-            generate_image_cloudflare(
+            generate_image_ollama(
                 prompt=__title,
-                output_path=file_name1,
+                output_path=file_name,
                 seed=seed,
                 width=width,
                 height=height
