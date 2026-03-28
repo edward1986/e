@@ -5,8 +5,6 @@ import requests
 
 CLOUDFLARE_ACCOUNT_ID = os.getenv("CLOUDFLARE_ACCOUNT_ID")
 CLOUDFLARE_API_TOKEN = os.getenv("CLOUDFLARE_API_TOKEN")
-
-# Good fast default for text-to-image on Workers AI
 CLOUDFLARE_IMAGE_MODEL = "@cf/lykon/dreamshaper-8-lcm"
 
 
@@ -17,12 +15,8 @@ def generate_image_cloudflare(
     model: str = CLOUDFLARE_IMAGE_MODEL,
     steps: int = 4,
     width: int = 1024,
-    height: int = 1024
+    height: int = 1024,
 ):
-    """
-    Generate an image using Cloudflare Workers AI and save it to output_path.
-    """
-
     if not CLOUDFLARE_ACCOUNT_ID:
         raise ValueError("Missing CLOUDFLARE_ACCOUNT_ID")
     if not CLOUDFLARE_API_TOKEN:
@@ -38,8 +32,6 @@ def generate_image_cloudflare(
         "Content-Type": "application/json",
     }
 
-    # Parameters can vary a bit by model.
-    # FLUX models accept at least prompt + seed; width/height/steps are commonly used.
     payload = {
         "prompt": prompt,
         "seed": seed,
@@ -49,24 +41,40 @@ def generate_image_cloudflare(
     }
 
     response = requests.post(url, headers=headers, json=payload, timeout=120)
+
+    # Raise HTTP errors first
     response.raise_for_status()
 
-    data = response.json()
+    content_type = (response.headers.get("Content-Type") or "").lower()
+
+    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
+
+    # Case 1: Cloudflare returns raw image bytes
+    if content_type.startswith("image/"):
+        with open(output_path, "wb") as f:
+            f.write(response.content)
+        return output_path
+
+    # Case 2: Cloudflare returns JSON
+    try:
+        data = response.json()
+    except ValueError:
+        raise RuntimeError(
+            f"Unexpected non-JSON, non-image response from Cloudflare. "
+            f"Content-Type={content_type}, first_200_bytes={response.text[:200]!r}"
+        )
 
     if not data.get("success", False):
         raise RuntimeError(f"Cloudflare API error: {data}")
 
     result = data.get("result", {})
 
-    # Workers AI image responses are commonly returned as base64 image data
+    # Some responses may still include base64 image data
     image_b64 = result.get("image")
-    if not image_b64:
-        raise RuntimeError(f"No image returned from Cloudflare: {data}")
+    if image_b64:
+        image_bytes = base64.b64decode(image_b64)
+        with open(output_path, "wb") as f:
+            f.write(image_bytes)
+        return output_path
 
-    image_bytes = base64.b64decode(image_b64)
-
-    os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
-    with open(output_path, "wb") as f:
-        f.write(image_bytes)
-
-    return output_path
+    raise RuntimeError(f"No image returned from Cloudflare: {data}")
