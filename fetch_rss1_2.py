@@ -12,7 +12,6 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from cloudflare_image import generate_image_cloudflare
-from ollama_image import generate_image_ollama
 import os
 from datetime import datetime
 import requests
@@ -822,21 +821,8 @@ try:
         file_name = f"image.jpg"
         file_name1 = f"generated/image_{seed}.jpg"
         try:
-            generate_image_ollama(
-                prompt=__title,
-                output_path=file_name,
-                seed=seed,
-                width=width,
-                height=height
-            )
-        
-            generate_image_ollama(
-                prompt=__title,
-                output_path=file_name,
-                seed=seed,
-                width=width,
-                height=height
-            )
+            download_image(image_url, file_name)
+            download_image(image_url, file_name1)
             imgbb_url1 = upload_to_imgbb(file_name)
         except Exception as e:
             print(f"Error generating random inputs for entry '{entry['title']}': {e}")
