@@ -40,7 +40,7 @@ jobs:
       - name: Pull models
         run: |
           ollama pull llama3
-          ollama pull x/flux2-klein
+          ollama pull x/flux2-klein:4b
   
       - name: Run RSS script
         env:
