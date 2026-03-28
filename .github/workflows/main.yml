@@ -22,26 +22,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install feedparser mysql-connector-python markdown yake requests
   
-      - name: Install system dependencies
+      - name: Install Ollama via Homebrew
         run: |
           brew update
-          brew install imagemagick ghostscript curl jq
-  
-      - name: Install Ollama
-        run: |
-          curl -fsSL https://ollama.com/install.sh | sh
+          brew install ollama
           ollama --version
   
-      - name: Start Ollama service
+      - name: Start Ollama server
         run: |
           nohup ollama serve > ollama.log 2>&1 &
           sleep 8
   
-      - name: Verify Ollama service
+      - name: Verify Ollama server
         run: |
-          curl http://127.0.0.1:11434/ || (echo "Ollama service not responding" && exit 1)
+          curl http://127.0.0.1:11434/ || (echo "Ollama server not responding" && exit 1)
   
-      - name: Pull Ollama models
+      - name: Pull models
         run: |
           ollama pull llama3
           ollama pull x/flux2-klein
@@ -52,27 +48,8 @@ jobs:
           MYSQL_USER: ${{ secrets.MYSQL_USER }}
           MYSQL_PASSWORD: ${{ secrets.MYSQL_PASSWORD }}
           MYSQL_DATABASE: ${{ secrets.MYSQL_DATABASE }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-          SENDER_PASSWORD: ${{ secrets.SENDER_PASSWORD }}
         run: |
-          set +e
           python fetch_rss1_2.py
-          if [ $? -ne 0 ]; then
-            echo "Error occurred while running fetch_rss1_2.py. Continuing..."
-          fi
-          set -e
-  
-      - name: Commit and push updated RSS data and GUIDs
-        run: |
-          git config --global user.name "GitHub Actions"
-          git config --global user.email "actions@github.com"
-          git add rss_data.json guids.json increment_files || true
-          git commit -m "Update RSS feed data and GUIDs" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
   update-rss1__3:
     runs-on: ubuntu-latest
 
